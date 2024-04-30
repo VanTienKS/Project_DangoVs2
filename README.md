@@ -3,7 +3,17 @@
 Client and server to play game **Project Dango Game**. It uses [pygame](https://www.pygame.org/news).
 
 # Screenshots
+
+- House
 ![](screenshots/house.png)
+
+- Framing
+![](screenshots/farming.gif)
+
+- Chat
+![](screenshots/chat.gif)
+
+
 
 ## Install
 Requires: Python >=3.6.

@@ -34,8 +34,8 @@ server_data = {
             'tomato': 20,
         },
         'seed_inventory': {
-            'corn': 5,
-            'tomato': 5,
+            'corn': 35,
+            'tomato': 35,
         },
         'money': 100,
     },
@@ -55,7 +55,7 @@ server_data = {
         },
         'seed_inventory': {
             'corn': 15,
-            'tomato': 5,
+            'tomato': 25,
         },
         'money': 200,
     },

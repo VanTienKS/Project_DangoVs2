@@ -110,7 +110,8 @@ class Player(pygame.sprite.Sprite):
                 self.selected_tool = self.tools[self.tool_index]
 
         # seed use
-        if keys[pygame.K_LCTRL]:
+        if keys[pygame.K_a] and not self.timers['seed use'].active:
+            print('avc')
             self.timers['seed use'].activate()
             self.direction = pygame.math.Vector2()
             self.frame_index = 0
@@ -161,9 +162,6 @@ class Player(pygame.sprite.Sprite):
             #     self.status = self.status.split('_')[0] + '_idle'
             # self.direction = pygame.math.Vector2()
             
-                
-        
-
     def use_tool(self):
         if self.selected_tool == 'hoe':
             self.soil_layer.get_hit(self.target_pos)

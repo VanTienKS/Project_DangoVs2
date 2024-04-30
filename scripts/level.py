@@ -47,7 +47,7 @@ class Level:
         self.success.set_volume(0.1)
         self.music = pygame.mixer.Sound('audio/bg.mp3')
         self.music.set_volume(0.2)
-        self.music.play(loops = -1)
+        # self.music.play(loops = -1)
 
 
         # shop
@@ -143,7 +143,7 @@ class Level:
         self.soil_layer.update_plants()
         # soil
         self.soil_layer.remove_water()
-        self.raining = randint(0,20) > 15
+        self.raining = randint(0,20) > 1
         self.soil_layer.raining = self.raining
         if self.raining:
             self.soil_layer.water_all()
