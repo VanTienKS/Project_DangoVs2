@@ -4,7 +4,6 @@ Client and server to play game **Project Dango Game**. It uses [pygame](https://
 
 # Screenshots
 
-- House
 ![](screenshots/house.png)
 
 - Framing
@@ -12,6 +11,10 @@ Client and server to play game **Project Dango Game**. It uses [pygame](https://
 
 - Chat
 ![](screenshots/chat.gif)
+
+- Trade
+![](screenshots/trade.gif)
+
 
 
 
@@ -45,9 +48,10 @@ socket_client.connect((server, port))
 
 HOST and PORT must be the same as the server.
 
-## Play
+## To PLay The Game
 
-
+- Step 1: Run server.py
+- Step 2: Run game.exe and enjoy the game :>
 
 ## Pathfinding algorithm
 
