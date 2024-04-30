@@ -11,9 +11,10 @@ from scripts.player import Player
 from scripts.transition import Transition
 from scripts.soil import SoilLayer
 from scripts.sky import Rain, Sky
+from scripts.menu import Menu
+from scripts.chat import Chat
 
 from pytmx.util_pygame import load_pygame
-
 
 class Level:
     def __init__(self):
@@ -38,7 +39,7 @@ class Level:
         self.transition = Transition(self.reset, self.player1, self.player2)
 
         self.rain = Rain(self.all_sprites)
-        self.raining = randint(0,20) > 10
+        self.raining = randint(0,20) > 1
         self.soil_layer.raining = self.raining
         
         # sounds
@@ -48,6 +49,15 @@ class Level:
         self.music.set_volume(0.2)
         self.music.play(loops = -1)
 
+
+        # shop
+        self.menu = Menu(self.player1, self.toggle_shop)
+        self.shop_active = False
+        
+        # chat
+        self.chat = Chat(self.player1, self.toggle_chat)
+        self.chat_active = False
+        
         self.error_frameP2 = 0
 
     def setup(self):
@@ -96,21 +106,31 @@ class Level:
         
         # Collision    
         for obj in tmx_data.get_layer_by_name('Collisions'):
-            Collision((obj.x, obj.y), obj.width, obj.height, [self.collision_sprites])     
+            Collision((obj.x, obj.y), obj.width, obj.height, [self.collision_sprites])
+        
+        # Object
+        for obj in tmx_data.get_layer_by_name('Objects'):
+            Generic((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites])     
 
-        # Interaction
+        # Interaction with Player
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Bed':
                 Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)
-                
+            if obj.name == 'Trader':
+                Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)   
         
-
         fullInfo = self.network.getInfo()
         self.player1 = Player(fullInfo['player1']['name'], fullInfo['player1']
-                              ['pos'], fullInfo['player1']['status'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer)
+                              ['pos'], fullInfo['player1']['status'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         self.player2 = Player(fullInfo['player2']['name'], fullInfo['player2']
-                              ['pos'], fullInfo['player2']['status'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer)
+                              ['pos'], fullInfo['player2']['status'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         self.sky.start_color = fullInfo['start_color']
+        
+    def toggle_shop(self):
+        self.shop_active = not self.shop_active  
+
+    def toggle_chat(self):
+        self.chat_active = not self.chat_active    
 
     def player_add(self, player, item):
         player.item_inventory[item] += 1
@@ -121,7 +141,7 @@ class Level:
         self.soil_layer.update_plants()
         # soil
         self.soil_layer.remove_water()
-        self.raining = randint(0,20) > 1
+        self.raining = randint(0,20) > 15
         self.soil_layer.raining = self.raining
         if self.raining:
             self.soil_layer.water_all()
@@ -185,30 +205,40 @@ class Level:
 
     def update(self, dt):
         for sprite in self.all_sprites.sprites():
-            if sprite is self.player2:
+            if sprite is self.player2 or (sprite is self.player1 and self.shop_active) or (sprite is self.player1 and self.chat_active):
                 sprite.update(dt, canMove=False)
+            # elif sprite is self.player1 and not self.shop_active:
+            #     sprite.update(dt)
             else:
                 sprite.update(dt)
         self.plant_collision()        
-        
         self.send_and_recv_data()
 
     def render(self, dt):
+        # drawing logic
         self.display_surface.fill((0, 0, 0))
         self.all_sprites.customize_draw(self.player1, self.player2)
-
-        self.overlay.display()
-
-        # rain
+        
+        # weather
         if self.raining:
             self.rain.update()
-            
+        # overlay
+        self.overlay.display()
         # day time
         self.sky.display(dt)
         
+        # shopping
+        if self.shop_active:
+            self.menu.display()
+        
+        # chating
+        if self.chat_active:
+            self.chat.update()
+            
         # transition overlay
         if self.player1.sleep and self.player2.sleep:
             self.transition.play()
+        
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):
@@ -243,6 +273,6 @@ class CameraGroup(pygame.sprite.Group):
                         #     pygame.draw.circle(self.display_surface, (0,0,200), target_pos, 5)
 
         debug(self.display_surface, player1.name, (player1.rect.centerx -
-              self.offset.x, player1.rect.centery - self.offset.y - 40), (255, 0, 0))
+              self.offset.x, player1.rect.centery - self.offset.y - 40), (255, 255, 0))
         debug(self.display_surface, player2.name, (player2.rect.centerx -
-              self.offset.x, player2.rect.centery - self.offset.y - 40), (255, 0, 0))
+              self.offset.x, player2.rect.centery - self.offset.y - 40), (0, 200, 200))

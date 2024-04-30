@@ -5,7 +5,7 @@ from scripts.timer import Timer
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, name, pos, status, group, collision_sprites, tree_sprites, interaction_sprites, soil_layer):
+    def __init__(self, name, pos, status, group, collision_sprites, tree_sprites, interaction_sprites, soil_layer, toggle_shop, toggle_chat):
         super().__init__(group)
 
         # general setup
@@ -27,6 +27,8 @@ class Player(pygame.sprite.Sprite):
         self.interaction_sprites = interaction_sprites
         self.soil_layer = soil_layer
         self.sleep = False
+        self.toggle_shop = toggle_shop
+        self.toggle_chat = toggle_chat
 
         # tools
         self.tools = ['hoe', 'axe', 'water']
@@ -45,6 +47,12 @@ class Player(pygame.sprite.Sprite):
             'corn': 0,
             'tomato': 0,
         }
+        
+        self.seed_inventory = {
+            'corn': 5,
+            'tomato': 5,
+        }
+        self.money = 200
 
         # timer
         self.timers = {
@@ -52,6 +60,7 @@ class Player(pygame.sprite.Sprite):
             'tool switch': Timer(1000),
             'seed use': Timer(300, self.use_seed),
             'seed switch': Timer(800),
+            'interaction': Timer(500)
         }
 
         # movement setup
@@ -121,13 +130,47 @@ class Player(pygame.sprite.Sprite):
             self.selected_seed = self.seeds[self.seed_index]
             
         if keys[pygame.K_RETURN]:
-            collided_interaction_sprite = pygame.sprite.spritecollide(self, self.interaction_sprites, False)
-            if collided_interaction_sprite:
-                if collided_interaction_sprite[0].name == 'Trader':
-                    pass
-                else:
-                    self.status = 'left_idle'
-                    self.sleep = True
+            vacham = False
+            for sprite in self.interaction_sprites.sprites():
+                if hasattr(sprite, 'hitbox'):
+                    if sprite.rect.colliderect(self.hitbox):
+                        vacham = True
+                        if not self.timers['interaction'].active:
+                            self.timers['interaction'].activate()
+                            if sprite.name == 'Trader':
+                                self.toggle_shop()
+                                self.status = self.status.split('_')[0] + '_idle'
+                            elif sprite.name == 'Bed':
+                                self.sleep = not self.sleep
+                                self.pos = Vector2(sprite.rect.topright if not self.sleep else sprite.rect.topleft, sprite.rect[1] + 10)
+                                
+                                self.status = 'down_idle' if self.sleep else 'right_idle'
+            if not vacham:
+                self.timers['interaction'].activate()
+                self.toggle_chat()
+                self.status = self.status.split('_')[0] + '_idle'
+            self.direction = pygame.math.Vector2()
+            
+            # collided_interaction_sprite = pygame.sprite.spritecollide(self, self.interaction_sprites, False)
+            # if collided_interaction_sprite:
+            #     if not self.timers['interaction'].active:
+            #         self.timers['interaction'].activate()
+            #         if collided_interaction_sprite[0].name == 'Trader':
+            #             self.toggle_shop()
+            #             self.status = self.status.split('_')[0] + '_idle'
+            #         elif collided_interaction_sprite[0].name == 'Bed':
+            #             self.sleep = not self.sleep
+            #             self.pos = Vector2(collided_interaction_sprite[0].rect.topright if not self.sleep else collided_interaction_sprite[0].rect.topleft, collided_interaction_sprite[0].rect[1] + 10)
+                        
+            #             self.status = 'down_idle' if self.sleep else 'right_idle'
+            # else:
+            #     self.timers['interaction'].activate()
+            #     self.toggle_chat()
+            #     self.status = self.status.split('_')[0] + '_idle'
+            # self.direction = pygame.math.Vector2()
+            
+                
+        
 
     def use_tool(self):
         if self.selected_tool == 'hoe':
@@ -141,7 +184,9 @@ class Player(pygame.sprite.Sprite):
             self.soil_layer.water(self.target_pos)
 
     def use_seed(self):
-        self.soil_layer.plant_seed(self.target_pos, self.selected_seed)
+        if self.seed_inventory[self.selected_seed] > 0:
+            self.soil_layer.plant_seed(self.target_pos, self.selected_seed)
+            self.seed_inventory[self.selected_seed] -= 1
 
     def get_status(self):
         # idle
