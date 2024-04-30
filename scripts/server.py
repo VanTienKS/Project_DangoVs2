@@ -28,10 +28,10 @@ server_data = {
         'selected_seed': 'tomato',
         'sleep': False,
         'item_inventory': {
-            'wood': 0,
-            'apple': 0,
-            'corn': 0,
-            'tomato': 0,
+            'wood': 10,
+            'apple': 4,
+            'corn': 8,
+            'tomato': 20,
         },
         'seed_inventory': {
             'corn': 5,
@@ -48,9 +48,9 @@ server_data = {
         'selected_seed': 'tomato',
         'sleep': False,
         'item_inventory': {
-            'wood': 0,
+            'wood': 77,
             'apple': 7,
-            'corn': 0,
+            'corn': 10,
             'tomato': 4,
         },
         'seed_inventory': {
@@ -60,6 +60,7 @@ server_data = {
         'money': 200,
     },
     'start_color': [255, 255, 255],
+    'chat': [],
 }
 
 currentPlayer = 0
@@ -68,7 +69,8 @@ def thread_client(conn, currentplayer):
     send_data = {
         'player1': server_data['player1' if currentplayer == 1 else 'player2'],
         'player2': server_data['player2' if currentplayer == 1 else 'player1'],
-        'start_color': server_data['start_color']
+        'start_color': server_data['start_color'],
+        'chat': server_data['chat'],
     }
     conn.send(pickle.dumps(send_data))
 
@@ -81,10 +83,14 @@ def thread_client(conn, currentplayer):
             else:
                 server_data['player1' if currentplayer == 1 else 'player2'] = receive_data['player1']
                 server_data['start_color'] = receive_data['start_color']
+                if len(receive_data['chat']) > 0:
+                    server_data['chat'] = receive_data['chat']
+                
                 
             send_data = {
                 'player2': server_data['player2' if currentplayer == 1 else 'player1'],
-                'start_color': server_data['start_color']
+                'start_color': server_data['start_color'],
+                'chat': server_data['chat'],
             }
             print("Received: ", receive_data)
             print("Send: ", send_data)

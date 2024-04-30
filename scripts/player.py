@@ -5,7 +5,7 @@ from scripts.timer import Timer
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, name, pos, status, group, collision_sprites, tree_sprites, interaction_sprites, soil_layer, toggle_shop, toggle_chat):
+    def __init__(self, name, pos, status, item_inventory, seed_inventory, group, collision_sprites, tree_sprites, interaction_sprites, soil_layer, toggle_shop, toggle_chat):
         super().__init__(group)
 
         # general setup
@@ -41,17 +41,9 @@ class Player(pygame.sprite.Sprite):
         self.selected_seed = self.seeds[self.seed_index]
         
         # inventory
-        self.item_inventory = {
-            'wood': 0,
-            'apple': 0,
-            'corn': 0,
-            'tomato': 0,
-        }
+        self.item_inventory = item_inventory
         
-        self.seed_inventory = {
-            'corn': 5,
-            'tomato': 5,
-        }
+        self.seed_inventory = seed_inventory
         self.money = 200
 
         # timer

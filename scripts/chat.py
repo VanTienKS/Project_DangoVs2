@@ -30,7 +30,6 @@ active_lower = False
 # Tạo biến cho cuộn nội dung
 # scroll_pos = 0
 
-
 class Chat:
     def __init__(self, player, chat_box):
         # general setup
@@ -45,11 +44,7 @@ class Chat:
         self.padding = 8
 
         # movement
-        self.index = 0
-        self.input_active = False  # Cờ chỉ trạng thái hiển thị ô nhập liệu
-        self.input_text = ""  # Chuỗi lưu dữ liệu nhập vào
         self.scroll_pos = 0  # Vị trí cuộn
-        self.input()
     
     def draw_text(self, surface, text, font, color, rect):
         text_surface = font.render(text, True, color)
@@ -120,7 +115,7 @@ class Chat:
             pygame.draw.rect(self.display_surface, BLACK, scroll_bar_rect)
 
         # Hiển thị nội dung của khung trên dựa trên self.scroll_pos
-        text_y = input_rect_upper.y - self.scroll_pos
+        text_y = input_rect_upper.y - self.scroll_pos - (20 if self.scroll_pos > 0 else 0)
         for line in output_text_lines:
             if text_y >= input_rect_upper.y and text_y < input_rect_upper.bottom - FONT_SIZE:
                 self.draw_text(self.display_surface, line, font, BLACK, pygame.Rect(input_rect_upper.x, text_y, input_rect_upper.width, FONT_SIZE))

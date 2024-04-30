@@ -12,7 +12,7 @@ from scripts.transition import Transition
 from scripts.soil import SoilLayer
 from scripts.sky import Rain, Sky
 from scripts.menu import Menu
-from scripts.chat import Chat
+from scripts.chat1 import Chat
 
 from pytmx.util_pygame import load_pygame
 
@@ -53,10 +53,6 @@ class Level:
         # shop
         self.menu = Menu(self.player1, self.toggle_shop)
         self.shop_active = False
-        
-        # chat
-        self.chat = Chat(self.player1, self.toggle_chat)
-        self.chat_active = False
         
         self.error_frameP2 = 0
 
@@ -120,11 +116,17 @@ class Level:
                 Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)   
         
         fullInfo = self.network.getInfo()
+        
         self.player1 = Player(fullInfo['player1']['name'], fullInfo['player1']
-                              ['pos'], fullInfo['player1']['status'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
+                              ['pos'], fullInfo['player1']['status'], fullInfo['player1']['item_inventory'], fullInfo['player1']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         self.player2 = Player(fullInfo['player2']['name'], fullInfo['player2']
-                              ['pos'], fullInfo['player2']['status'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
+                              ['pos'], fullInfo['player2']['status'], fullInfo['player2']['item_inventory'], fullInfo['player2']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         self.sky.start_color = fullInfo['start_color']
+        
+        # chat
+        self.chat = Chat(self.player1.name, self.toggle_chat)
+        self.chat_active = False
+        self.chat.output_text_lines = fullInfo['chat']
         
     def toggle_shop(self):
         self.shop_active = not self.shop_active  
@@ -170,6 +172,12 @@ class Level:
                     plant.kill()
 
     def send_and_recv_data(self):
+
+        output_text_lines = []
+        if self.chat.has_chat:
+            self.chat.has_chat = False
+            output_text_lines = self.chat.output_text_lines
+        
         send_Info = {
             'player1': {
                 'name': self.player1.name,
@@ -178,9 +186,12 @@ class Level:
                 'frame_index': self.player1.frame_index,
                 'selected_tool': self.player1.selected_tool,
                 'selected_seed': self.player1.selected_seed,
+                'item_inventory':self.player1.item_inventory,
+                'seed_inventory':self.player1.seed_inventory,
                 'sleep': self.player1.sleep,
             },
             'start_color': self.sky.start_color,
+            'chat': output_text_lines,
         }
         recvInfo = self.network.send(send_Info)
 
@@ -196,10 +207,13 @@ class Level:
             'player2']['frame_index'] != self.error_frameP2 else self.player2.frame_index
         
         self.player2.selected_tool = recvInfo['player2']['selected_tool']
+        self.player2.selected_seed = recvInfo['player2']['selected_seed']
+        self.player2.item_inventory = recvInfo['player2']['item_inventory']
+        self.player2.seed_inventory = recvInfo['player2']['seed_inventory']
         self.player2.sleep = recvInfo['player2']['sleep']
         
         self.sky.start_color = recvInfo['start_color']
-        
+        self.chat.output_text_lines = recvInfo['chat']
 
         self.error_frameP2 = recvInfo['player2']['frame_index']
 

@@ -4,6 +4,7 @@ SCREEN_HEIGHT = 800
 FPS = 60
 
 TILE_SIZE = 64
+FONT_SIZE = 30
 
 COLOR_TEXT = (255,255,255)
 
@@ -43,4 +44,16 @@ APPLE_POS = {
 GROW_SPEED = {
     'corn': 1,
     'tomato': 0.7,
+}
+
+SALE_PRICES = {
+    'wood': 4,
+    'apple': 2,
+    'corn': 10,
+    'tomato': 20,
+}
+
+PURCHASE_PRICES = {
+    'corn': 5,
+    'tomato': 8,
 }
