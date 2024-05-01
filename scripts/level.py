@@ -200,7 +200,7 @@ class Level:
             if recvInfo['player2']['status'].split('_')[1] in self.player2.tools:
                 self.player2.timers['tool use'].activate()
             if recvInfo['player2']['status'].split('_')[1] in self.player2.seeds:
-                self.player2.timers['tool seed'].activate()
+                self.player2.timers['seed use'].activate()
         
         self.player2.status = recvInfo['player2']['status']
         self.player2.frame_index = recvInfo['player2']['frame_index'] if recvInfo[

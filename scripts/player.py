@@ -174,6 +174,7 @@ class Player(pygame.sprite.Sprite):
             self.soil_layer.water(self.target_pos)
 
     def use_seed(self):
+        print(self.selected_seed)
         if self.seed_inventory[self.selected_seed] > 0:
             self.soil_layer.plant_seed(self.target_pos, self.selected_seed)
             self.seed_inventory[self.selected_seed] -= 1

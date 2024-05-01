@@ -23,6 +23,8 @@ Requires: Python >=3.6.
 To install, open a command prompt and launch:
 ```bash
 pip3 install pygame
+pip3 install pytmx
+
 ```
 
 ## Use
