@@ -39,7 +39,7 @@ class Level:
         self.transition = Transition(self.reset, self.player1, self.player2)
 
         self.rain = Rain(self.all_sprites)
-        self.raining = randint(0,20) > 1
+        # self.raining = randint(0,20) > 15
         self.soil_layer.raining = self.raining
         
         # sounds
@@ -55,6 +55,7 @@ class Level:
         self.shop_active = False
         
         self.error_frameP2 = 0
+        self.new_day = False
 
     def setup(self):
         tmx_data = load_pygame('data/map.tmx')
@@ -122,6 +123,7 @@ class Level:
         self.player2 = Player(fullInfo['player2']['name'], fullInfo['player2']
                               ['pos'], fullInfo['player2']['status'], fullInfo['player2']['item_inventory'], fullInfo['player2']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         self.sky.start_color = fullInfo['start_color']
+        self.raining = fullInfo['rain']
         
         # chat
         self.chat = Chat(self.player1.name, self.toggle_chat)
@@ -139,11 +141,12 @@ class Level:
         self.success.play()
 
     def reset(self):
+        self.new_day = True
         # plants
         self.soil_layer.update_plants()
         # soil
         self.soil_layer.remove_water()
-        self.raining = randint(0,20) > 1
+        self.raining = randint(0,20) > 10
         self.soil_layer.raining = self.raining
         if self.raining:
             self.soil_layer.water_all()
@@ -177,6 +180,10 @@ class Level:
         if self.chat.has_chat:
             self.chat.has_chat = False
             output_text_lines = self.chat.output_text_lines
+        rain = None
+        if self.new_day:
+            self.new_day = False
+            rain = self.raining
         
         send_Info = {
             'player1': {
@@ -192,6 +199,7 @@ class Level:
             },
             'start_color': self.sky.start_color,
             'chat': output_text_lines,
+            'rain': rain,
         }
         recvInfo = self.network.send(send_Info)
 
@@ -210,10 +218,19 @@ class Level:
         self.player2.selected_seed = recvInfo['player2']['selected_seed']
         self.player2.item_inventory = recvInfo['player2']['item_inventory']
         self.player2.seed_inventory = recvInfo['player2']['seed_inventory']
-        self.player2.sleep = recvInfo['player2']['sleep']
         
+        if 100 < self.transition.color < 255 and recvInfo['player2']['sleep'] == False:
+            self.transition.color = 255
+            self.transition.speed = -2
+            self.player1.sleep = False
+            self.player1.pos.x += 150
+        self.player2.sleep = recvInfo['player2']['sleep']
+
+         
         self.sky.start_color = recvInfo['start_color']
         self.chat.output_text_lines = recvInfo['chat']
+        self.raining = recvInfo['rain']
+        
 
         self.error_frameP2 = recvInfo['player2']['frame_index']
 
@@ -227,6 +244,7 @@ class Level:
                 sprite.update(dt)
         self.plant_collision()        
         self.send_and_recv_data()
+        print(self.raining)
 
     def render(self, dt):
         # drawing logic
@@ -251,9 +269,8 @@ class Level:
             
         # transition overlay
         if self.player1.sleep and self.player2.sleep:
-            self.transition.play()
-        
-
+            self.transition.play()  
+    
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()

@@ -1,6 +1,7 @@
 import socket
 import pickle
 import pygame
+from random import randint
 
 from _thread import start_new_thread
 from pytmx.util_pygame import load_pygame
@@ -61,6 +62,7 @@ server_data = {
     },
     'start_color': [255, 255, 255],
     'chat': [],
+    'rain': randint(0,20) > 10,
 }
 
 currentPlayer = 0
@@ -71,6 +73,7 @@ def thread_client(conn, currentplayer):
         'player2': server_data['player2' if currentplayer == 1 else 'player1'],
         'start_color': server_data['start_color'],
         'chat': server_data['chat'],
+        'rain': server_data['rain'],
     }
     conn.send(pickle.dumps(send_data))
 
@@ -85,15 +88,18 @@ def thread_client(conn, currentplayer):
                 server_data['start_color'] = receive_data['start_color']
                 if len(receive_data['chat']) > 0:
                     server_data['chat'] = receive_data['chat']
-                
+                if receive_data['rain'] is not None:
+                    server_data['rain'] = receive_data['rain']
                 
             send_data = {
                 'player2': server_data['player2' if currentplayer == 1 else 'player1'],
                 'start_color': server_data['start_color'],
                 'chat': server_data['chat'],
+                'rain': server_data['rain'],
+                
             }
-            print("Received: ", receive_data)
-            print("Send: ", send_data)
+            # print("Received: ", receive_data['player1']['name'], receive_data['rain'])
+            print("Send: ", send_data['player2']['name'], send_data['rain'])
             
             conn.send(pickle.dumps(send_data))
         except:

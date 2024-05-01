@@ -111,7 +111,7 @@ class Player(pygame.sprite.Sprite):
 
         # seed use
         if keys[pygame.K_a] and not self.timers['seed use'].active:
-            print('avc')
+            print('avc')    
             self.timers['seed use'].activate()
             self.direction = pygame.math.Vector2()
             self.frame_index = 0
@@ -136,7 +136,6 @@ class Player(pygame.sprite.Sprite):
                             elif sprite.name == 'Bed':
                                 self.sleep = not self.sleep
                                 self.pos = Vector2(sprite.rect.topright if not self.sleep else sprite.rect.topleft, sprite.rect[1] + 10)
-                                
                                 self.status = 'down_idle' if self.sleep else 'right_idle'
             if not vacham:
                 self.timers['interaction'].activate()
