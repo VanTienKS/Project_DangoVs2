@@ -31,9 +31,6 @@ class Transition:
             self.player1.sleep = False
             self.player1.pos.x += 150
             
-            
-            
-            
         self.image.fill((self.color, self.color, self.color))
         self.display_surface.blit(self.image, (0, 0), special_flags=pygame.BLEND_RGB_MULT)
 

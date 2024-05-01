@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.soil_layer = soil_layer
         self.sleep = False
         self.toggle_shop = toggle_shop
-        self.toggle_chat = toggle_chat
+        self.toggle_chat = toggle_chat  
 
         # tools
         self.tools = ['hoe', 'axe', 'water']
@@ -54,7 +54,7 @@ class Player(pygame.sprite.Sprite):
             'seed switch': Timer(800),
             'interaction': Timer(500)
         }
-
+        
         # movement setup
         self.direction = pygame.math.Vector2()
         self.pos = pygame.math.Vector2(self.rect.center)
@@ -63,6 +63,9 @@ class Player(pygame.sprite.Sprite):
         # sound
         self.watering = pygame.mixer.Sound('audio/water.mp3')
         self.watering.set_volume(0.1)
+        
+        # attribute to fix bug
+        self.has_use_seed = False
 
     def import_assets(self):
         self.animations = {'up': [], 'down': [], 'left': [], 'right': [],
@@ -92,10 +95,10 @@ class Player(pygame.sprite.Sprite):
 
         # if we don't use tool then we can move
         if not self.timers['tool use'].active and not self.sleep:
-            self.direction.x, self.status = (-1, 'left') if keys[pygame.K_LEFT] else (
-                (1, 'right') if keys[pygame.K_RIGHT] else (0, self.status))
-            self.direction.y, self.status = (-1, 'up') if keys[pygame.K_UP] else (
-                (1, 'down') if keys[pygame.K_DOWN] else (0, self.status))
+            self.direction.x, self.status = (-1, 'left') if (keys[pygame.K_LEFT] or keys[pygame.K_a]) else (
+                (1, 'right') if (keys[pygame.K_RIGHT] or keys[pygame.K_d]) else (0, self.status))
+            self.direction.y, self.status = (-1, 'up') if (keys[pygame.K_UP] or keys[pygame.K_w]) else (
+                (1, 'down') if (keys[pygame.K_DOWN] or keys[pygame.K_s]) else (0, self.status))
 
             # tool use
             if keys[pygame.K_SPACE]:
@@ -109,12 +112,13 @@ class Player(pygame.sprite.Sprite):
                 self.tool_index = (self.tool_index + 1) % len(self.tools)
                 self.selected_tool = self.tools[self.tool_index]
 
-        # seed use
-        if keys[pygame.K_a] and not self.timers['seed use'].active:
-            print('avc')    
-            self.timers['seed use'].activate()
-            self.direction = pygame.math.Vector2()
-            self.frame_index = 0
+            # seed use
+            if keys[pygame.K_LCTRL] and not self.timers['seed use'].active:
+                self.timers['seed use'].activate()
+                self.direction = pygame.math.Vector2()  
+                self.frame_index = 0
+                # fix bug
+                self.has_use_seed = True
 
         # change seed
         if keys[pygame.K_e] and not self.timers['seed switch'].active:
@@ -123,11 +127,12 @@ class Player(pygame.sprite.Sprite):
             self.selected_seed = self.seeds[self.seed_index]
             
         if keys[pygame.K_RETURN]:
-            vacham = False
+            collision = False
             for sprite in self.interaction_sprites.sprites():
                 if hasattr(sprite, 'hitbox'):
                     if sprite.rect.colliderect(self.hitbox):
-                        vacham = True
+                    # if self.hitbox.colliderect(sprite.rect):
+                        collision = True
                         if not self.timers['interaction'].active:
                             self.timers['interaction'].activate()
                             if sprite.name == 'Trader':
@@ -137,10 +142,9 @@ class Player(pygame.sprite.Sprite):
                                 self.sleep = not self.sleep
                                 self.pos = Vector2(sprite.rect.topright if not self.sleep else sprite.rect.topleft, sprite.rect[1] + 10)
                                 self.status = 'down_idle' if self.sleep else 'right_idle'
-            if not vacham:
+            if not collision:
                 self.timers['interaction'].activate()
                 self.toggle_chat()
-                self.status = self.status.split('_')[0] + '_idle'
             self.direction = pygame.math.Vector2()
             
             # collided_interaction_sprite = pygame.sprite.spritecollide(self, self.interaction_sprites, False)
@@ -173,10 +177,11 @@ class Player(pygame.sprite.Sprite):
             self.soil_layer.water(self.target_pos)
 
     def use_seed(self):
-        print(self.selected_seed)
+        print('do some thing')
         if self.seed_inventory[self.selected_seed] > 0:
-            self.soil_layer.plant_seed(self.target_pos, self.selected_seed)
-            self.seed_inventory[self.selected_seed] -= 1
+            self.soil_layer.plant_seed(self)
+        # fix bug
+        self.has_use_seed = False
 
     def get_status(self):
         # idle

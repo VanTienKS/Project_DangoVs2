@@ -54,12 +54,13 @@ class Chat:
             if event.type == pygame.KEYDOWN:
                 if self.chating:
                     if event.key == pygame.K_RETURN:
-                        present = f'[{self.player_name}]~ {self.input_text_lower}'
-                        self.output_text_lines.append(present)  # Thêm nội dung của khung dưới vào danh sách dòng
-                        self.has_chat = True
-                        self.input_text_lower = ''  # Xóa nội dung của khung dưới
-                        # Cập nhật vị trí cuộn để hiển thị dòng mới
-                        self.scroll_pos = max(0, len(self.output_text_lines) *FONT_SIZE - self.input_rect_upper.height)
+                        if self.input_text_lower != '':
+                            present = f'[{self.player_name}]~ {self.input_text_lower}'
+                            self.output_text_lines.append(present)  # Thêm nội dung của khung dưới vào danh sách dòng
+                            self.has_chat = True
+                            self.input_text_lower = ''  # Xóa nội dung của khung dưới
+                            # Cập nhật vị trí cuộn để hiển thị dòng mới
+                            self.scroll_pos = max(0, len(self.output_text_lines) *FONT_SIZE - self.input_rect_upper.height)
                     elif event.key == pygame.K_BACKSPACE:
                         self.input_text_lower = self.input_text_lower[:-1]  # Xóa ký tự cuối cùng khi nhấn Backspace
                     else:

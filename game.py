@@ -10,7 +10,6 @@ class Game:
         pygame.display.set_caption("Project Dango Version2")
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
-        
         self.level = Level()
         
     def run(self):

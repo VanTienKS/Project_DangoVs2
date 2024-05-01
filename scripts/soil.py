@@ -178,16 +178,18 @@ class SoilLayer:
         is_watered = 'W' in cell
         return is_watered
                     
-    def plant_seed(self, target_pos, seed):
+    def plant_seed(self, player):
+        print('asdasds')
         for soil_sprite in self.soil_sprites.sprites():
-            if soil_sprite.rect.collidepoint(target_pos):
+            if soil_sprite.rect.collidepoint(player.target_pos,):
                 self.plant_sound.play()
                 x = soil_sprite.rect.x // TILE_SIZE
                 y = soil_sprite.rect.y // TILE_SIZE
                 
                 if 'P' not in self.grid[y][x]:
                     self.grid[y][x].append('P')
-                    Plant(seed, [self.all_sprites, self.plant_sprites, self.collision_sprites], soil_sprite, self.check_watered)
+                    player.seed_inventory[player.selected_seed] -= 1
+                    Plant(player.selected_seed, [self.all_sprites, self.plant_sprites, self.collision_sprites], soil_sprite, self.check_watered)
     
     def update_plants(self):
         for plant in self.plant_sprites.sprites():

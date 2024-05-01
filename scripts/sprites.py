@@ -107,8 +107,7 @@ class Tree(Generic):
             self.image = self.stump_surf
             self.rect = self.image.get_rect(midbottom = self.rect.midbottom)
             self.hitbox = self.rect.copy().inflate(-10, -self.rect.height * 0.6)
-            self.alived = False
-            
+            self.alived = False    
             
     def update(self, dt):
         if self.alived:
@@ -116,9 +115,9 @@ class Tree(Generic):
                
         
 class Collision(Generic):
-    def __init__(self, pos, width, height, groups):
+    def __init__(self, pos, size, groups):
         
-        surface = pygame.Surface((width, height))
+        surface = pygame.Surface(size)
         surface.fill('red')
         super().__init__(pos, surface, groups)
         self.hitbox = self.rect.copy()

@@ -103,7 +103,7 @@ class Level:
         
         # Collision    
         for obj in tmx_data.get_layer_by_name('Collisions'):
-            Collision((obj.x, obj.y), obj.width, obj.height, [self.collision_sprites])
+            Collision((obj.x, obj.y), (obj.width, obj.height), [self.collision_sprites])
         
         # Object
         for obj in tmx_data.get_layer_by_name('Objects'):
@@ -111,9 +111,9 @@ class Level:
 
         # Interaction with Player
         for obj in tmx_data.get_layer_by_name('Player'):
-            if obj.name == 'Bed':
-                Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)
             if obj.name == 'Trader':
+                Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)
+            if obj.name == 'Bed':
                 Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)   
         
         fullInfo = self.network.getInfo()
@@ -180,6 +180,7 @@ class Level:
         if self.chat.has_chat:
             self.chat.has_chat = False
             output_text_lines = self.chat.output_text_lines
+            
         rain = None
         if self.new_day:
             self.new_day = False
@@ -193,9 +194,12 @@ class Level:
                 'frame_index': self.player1.frame_index,
                 'selected_tool': self.player1.selected_tool,
                 'selected_seed': self.player1.selected_seed,
-                'item_inventory':self.player1.item_inventory,
-                'seed_inventory':self.player1.seed_inventory,
+                'item_inventory': self.player1.item_inventory,
+                'seed_inventory': self.player1.seed_inventory,
                 'sleep': self.player1.sleep,
+                
+                'money': self.player1.money,
+                'has_use_seed': self.player1.has_use_seed,
             },
             'start_color': self.sky.start_color,
             'chat': output_text_lines,
@@ -207,8 +211,10 @@ class Level:
         if self.player2.status != recvInfo['player2']['status'] and len(recvInfo['player2']['status'].split('_')) > 1:
             if recvInfo['player2']['status'].split('_')[1] in self.player2.tools:
                 self.player2.timers['tool use'].activate()
-            if recvInfo['player2']['status'].split('_')[1] in self.player2.seeds:
-                self.player2.timers['seed use'].activate()
+            # if recvInfo['player2']['status'].split('_')[1] in self.player2.seeds:
+        if not self.player2.has_use_seed and recvInfo['player2']['has_use_seed'] == True:
+            self.player2.has_use_seed = True
+            self.player2.timers['seed use'].activate()
         
         self.player2.status = recvInfo['player2']['status']
         self.player2.frame_index = recvInfo['player2']['frame_index'] if recvInfo[
@@ -225,7 +231,8 @@ class Level:
             self.player1.sleep = False
             self.player1.pos.x += 150
         self.player2.sleep = recvInfo['player2']['sleep']
-
+        self.player2.money = recvInfo['player2']['money']
+        
          
         self.sky.start_color = recvInfo['start_color']
         self.chat.output_text_lines = recvInfo['chat']
@@ -244,7 +251,6 @@ class Level:
                 sprite.update(dt)
         self.plant_collision()        
         self.send_and_recv_data()
-        print(self.raining)
 
     def render(self, dt):
         # drawing logic
@@ -294,14 +300,14 @@ class CameraGroup(pygame.sprite.Group):
                         offset_rect = sprite.rect.copy()
                         offset_rect.center -= self.offset
                         self.display_surface.blit(sprite.image, offset_rect)
-                        # if isinstance(sprite, Player) or isinstance(sprite, Tree):
-                        #     pygame.draw.rect(self.display_surface, (0,255,0), offset_rect, 5)
-                        #     hitbox_rect = sprite.hitbox.copy()
-                        #     hitbox_rect.center = offset_rect.center
-                        #     pygame.draw.rect(self.display_surface, 'gray', hitbox_rect, 5)
-                        # if isinstance(sprite, Player):  
-                        #     target_pos = offset_rect.center + PLAYER_TOOL_OFFSET[sprite.status.split('_')[0]]
-                        #     pygame.draw.circle(self.display_surface, (0,0,200), target_pos, 5)
+                        if isinstance(sprite, Player) or isinstance(sprite, Tree):
+                            pygame.draw.rect(self.display_surface, (0,255,0), offset_rect, 5)
+                            hitbox_rect = sprite.hitbox.copy()
+                            hitbox_rect.center = offset_rect.center
+                            pygame.draw.rect(self.display_surface, 'gray', hitbox_rect, 5)
+                        if isinstance(sprite, Player):  
+                            target_pos = offset_rect.center + PLAYER_TOOL_OFFSET[sprite.status.split('_')[0]]
+                            pygame.draw.circle(self.display_surface, (0,0,200), target_pos, 5)
 
         debug(self.display_surface, player1.name, (player1.rect.centerx -
               self.offset.x, player1.rect.centery - self.offset.y - 40), (255, 255, 0))

@@ -39,6 +39,7 @@ server_data = {
             'tomato': 35,
         },
         'money': 100,
+        'has_use_seed': False,
     },
     'player2': {
         'name': 'Tien Dat',
@@ -59,9 +60,11 @@ server_data = {
             'tomato': 25,
         },
         'money': 200,
+        'has_use_seed': False,
     },
+    
     'start_color': [255, 255, 255],
-    'chat': [],
+    'chat': ['eee', 'ewe', 'wwew'],
     'rain': randint(0,20) > 10,
 }
 
@@ -98,8 +101,8 @@ def thread_client(conn, currentplayer):
                 'rain': server_data['rain'],
                 
             }
-            # print("Received: ", receive_data['player1']['name'], receive_data['rain'])
-            print("Send: ", send_data['player2']['name'], send_data['rain'])
+            print("Received: ", receive_data['player1']['name'], receive_data['player1']['has_use_seed'])
+            print("Send: ", send_data['player2']['name'], send_data['player2']['has_use_seed'])
             
             conn.send(pickle.dumps(send_data))
         except:
@@ -111,6 +114,7 @@ def thread_client(conn, currentplayer):
 
 
 while True:
+    # block code
     conn, addr = socket_server.accept()
     print("Connect to: ", addr)
     currentPlayer = (currentPlayer + 1) % 2
