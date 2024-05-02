@@ -18,6 +18,10 @@ from pytmx.util_pygame import load_pygame
 
 class Level:
     def __init__(self):
+        
+        # map name
+        self.map_name = 'River Land Farm'
+
         # network
         self.network = Network()
 
@@ -33,12 +37,12 @@ class Level:
         # sky
         self.sky = Sky()
         
-        self.soil_layer = SoilLayer(self.all_sprites, self.collision_sprites)
+        self.soil_layer = SoilLayer(self.map_name, self.all_sprites, self.collision_sprites)
         self.setup()
         self.overlay = Overlay(self.player1)
         self.transition = Transition(self.reset, self.player1, self.player2)
 
-        self.rain = Rain(self.all_sprites)
+        self.rain = Rain(self.map_name, self.all_sprites)
         # self.raining = randint(0,20) > 15
         self.soil_layer.raining = self.raining
         
@@ -58,7 +62,7 @@ class Level:
         self.new_day = False
 
     def setup(self):
-        tmx_data = load_pygame('data/map.tmx')
+        tmx_data = load_pygame(f'data/{self.map_name}.tmx')
         
         # Water 
         for x, y, _ in tmx_data.get_layer_by_name('Water').tiles():
@@ -113,19 +117,26 @@ class Level:
         for obj in tmx_data.get_layer_by_name('Objects'):
             Generic((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites])     
 
+
+
+        fullInfo = self.network.getInfo()
+
         # Interaction with Player
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Trader':
                 Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)
-            if obj.name == 'Bed':
+            elif obj.name == 'Bed':
                 Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)   
+            elif obj.name == 'Player1_Pos':
+                self.player1 = Player(fullInfo['player1']['name'], pygame.math.Vector2(obj.x, obj.y), fullInfo['player1']['status'], fullInfo['player1']['item_inventory'], fullInfo['player1']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
+            elif obj.name == 'Player2_Pos':
+                self.player2 = Player(fullInfo['player2']['name'], pygame.math.Vector2(obj.x, obj.y), fullInfo['player2']['status'], fullInfo['player2']['item_inventory'], fullInfo['player2']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         
-        fullInfo = self.network.getInfo()
         
-        self.player1 = Player(fullInfo['player1']['name'], fullInfo['player1']
-                              ['pos'], fullInfo['player1']['status'], fullInfo['player1']['item_inventory'], fullInfo['player1']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
-        self.player2 = Player(fullInfo['player2']['name'], fullInfo['player2']
-                              ['pos'], fullInfo['player2']['status'], fullInfo['player2']['item_inventory'], fullInfo['player2']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
+        # self.player1 = Player(fullInfo['player1']['name'], fullInfo['player1']
+        #                       ['pos'], fullInfo['player1']['status'], fullInfo['player1']['item_inventory'], fullInfo['player1']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
+        # self.player2 = Player(fullInfo['player2']['name'], fullInfo['player2']
+        #                       ['pos'], fullInfo['player2']['status'], fullInfo['player2']['item_inventory'], fullInfo['player2']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         self.sky.start_color = fullInfo['start_color']
         self.raining = fullInfo['rain']
         
