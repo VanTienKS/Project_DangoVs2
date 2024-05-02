@@ -58,7 +58,7 @@ class Level:
         self.new_day = False
 
     def setup(self):
-        tmx_data = load_pygame('data/map1.tmx')
+        tmx_data = load_pygame('data/map.tmx')
         
         # Water 
         for x, y, _ in tmx_data.get_layer_by_name('Water').tiles():

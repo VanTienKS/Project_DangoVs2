@@ -22,7 +22,7 @@ print("Server waiting for connection")
 server_data = {
     'player1': {
         'name': 'Van Tien',
-        'pos': pygame.math.Vector2(600, 300),
+        'pos': pygame.math.Vector2(2144, 1680),
         'status': 'down_idle',
         'frame_index': 1,
         'selected_tool': 'axe',
@@ -43,7 +43,7 @@ server_data = {
     },
     'player2': {
         'name': 'Tien Dat',
-        'pos': pygame.math.Vector2(1500, 1900),
+        'pos': pygame.math.Vector2(770, 3444),
         'status': 'left_idle',
         'frame_index': 1,
         'selected_tool': 'hoe',
