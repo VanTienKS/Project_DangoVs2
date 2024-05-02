@@ -58,7 +58,7 @@ class Level:
         self.new_day = False
 
     def setup(self):
-        tmx_data = load_pygame('data/map.tmx')
+        tmx_data = load_pygame('data/map1.tmx')
         
         # Water 
         for x, y, _ in tmx_data.get_layer_by_name('Water').tiles():
@@ -83,11 +83,15 @@ class Level:
                 
         for layer in ['HouseWalls', 'HouseFurnitureTop']:
             for x, y, surf in tmx_data.get_layer_by_name(layer).tiles():
-                Generic((x*TILE_SIZE, y*TILE_SIZE), surf, self.all_sprites)
+                Generic((x*TILE_SIZE, y*TILE_SIZE), surf, [self.all_sprites, self.collision_sprites])
                 
         # Hill
         for x, y, surf in tmx_data.get_layer_by_name('Hills').tiles():
             Generic((x*TILE_SIZE, y*TILE_SIZE), surf, [self.all_sprites], LAYERS['ground plant'])   
+
+        # Bridge
+        for x, y, surf in tmx_data.get_layer_by_name('Bridge').tiles():
+            Generic((x*TILE_SIZE, y*TILE_SIZE), surf, [self.all_sprites], LAYERS['house bottom'])   
                          
         # Fence
         for x, y, surf in tmx_data.get_layer_by_name('Fence').tiles():
