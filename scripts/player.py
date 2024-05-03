@@ -199,6 +199,12 @@ class Player(pygame.sprite.Sprite):
         for timer in self.timers.values():
             timer.update()
 
+    def near_player(self, sprite):
+        if self.rect.centerx - (500/2 + self.rect.width) < sprite.rect.centerx < self.rect.centerx +  (500/2 + self.rect.width):
+            if self.rect.centery - (500/2 + self.rect.height) < sprite.rect.centery < self.rect.centery + (500/2 + self.rect.height):
+                return True
+        return False
+
     def collision(self, direction):
         for sprite in self.collision_sprites.sprites():
             if hasattr(sprite, 'hitbox'):

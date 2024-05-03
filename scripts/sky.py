@@ -50,8 +50,9 @@ class Rain:
         self.all_sprites = all_sprite
         self.rain_drops = import_folder('graphics/rain/drops/')
         self.rain_floor = import_folder('graphics/rain/floor/')
-        self.floor_w, self.floor_h = pygame.image.load(f'graphics/world/{map_name}.png').get_size()
-
+        # self.floor_w, self.floor_h = pygame.image.load(f'graphics/world/{map_name}.png').get_size()
+        self.floor_w, self.floor_h = SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2
+        
     def create_floor(self):
         Drop(
             pos=(randint(0, self.floor_w), randint(0, self.floor_h)),

@@ -19,6 +19,10 @@ except socket.error as e:
 socket_server.listen(2)
 print("Server waiting for connection")
 
+# 2144, 1680 / 770, 3444
+
+# 1500, 1500 / 1300, 1200
+
 server_data = {
     'player1': {
         'name': 'Van Tien',
@@ -119,45 +123,3 @@ while True:
     print("Connect to: ", addr)
     currentPlayer = (currentPlayer + 1) % 2
     start_new_thread(thread_client, (conn, currentPlayer))
-
-# currentPlayer = 'player2'
-
-# def thread_client(conn, currentplayer):
-#     send_data = {
-#         'player1': server_data['player1' if currentplayer == 'player1' else 'player2'],
-#         'player2': server_data['player2' if currentplayer == 'player1' else 'player1'],
-#         'start_color': server_data['start_color']
-#     }
-#     conn.send(pickle.dumps(send_data))
-
-#     while True:
-#         try:
-#             receive_data = pickle.loads(conn.recv(4096))
-#             if not receive_data:
-#                 print('Disconnected')
-#                 break
-#             else:
-#                 server_data['player1' if currentplayer == 'player1' else 'player2'] = receive_data['player1']
-#                 server_data['start_color'] = receive_data['start_color']
-                
-#             send_data = {
-#                 'player2': server_data['player2' if currentplayer == 'player1' else 'player1'],
-#                 'start_color': server_data['start_color']
-#             }
-#             print("Received: ", receive_data)
-#             print("Send: ", send_data)
-            
-#             conn.send(pickle.dumps(send_data))
-#         except:
-#             break
-
-#     # global currentPlayer
-#     # currentPlayer = max(0, currentPlayer - 1)
-#     # print(currentPlayer)
-
-
-# while True:
-#     conn, addr = socket_server.accept()
-#     print("Connect to: ", addr)
-#     currentPlayer = 'player1' if currentPlayer == 'player2' else 'player2'
-#     start_new_thread(thread_client, (conn, currentPlayer))

@@ -43,7 +43,6 @@ class Level:
         self.transition = Transition(self.reset, self.player1, self.player2)
 
         self.rain = Rain(self.map_name, self.all_sprites)
-        # self.raining = randint(0,20) > 15
         self.soil_layer.raining = self.raining
         
         # sounds
@@ -51,7 +50,7 @@ class Level:
         self.success.set_volume(0.1)
         self.music = pygame.mixer.Sound('audio/bg.mp3')
         self.music.set_volume(0.2)
-        # self.music.play(loops = -1)
+        self.music.play(loops = -1)
 
 
         # shop
@@ -117,8 +116,6 @@ class Level:
         for obj in tmx_data.get_layer_by_name('Objects'):
             Generic((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites])     
 
-
-
         fullInfo = self.network.getInfo()
 
         # Interaction with Player
@@ -128,15 +125,10 @@ class Level:
             elif obj.name == 'Bed':
                 Interaction((obj.x, obj.y), (obj.width, obj.height), self.interaction_sprites, obj.name)   
             elif obj.name == 'Player1_Pos':
-                self.player1 = Player(fullInfo['player1']['name'], pygame.math.Vector2(obj.x, obj.y), fullInfo['player1']['status'], fullInfo['player1']['item_inventory'], fullInfo['player1']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
+                self.player1 = Player(fullInfo['player1']['name'], fullInfo['player1']['pos'], fullInfo['player1']['status'], fullInfo['player1']['item_inventory'], fullInfo['player1']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
             elif obj.name == 'Player2_Pos':
-                self.player2 = Player(fullInfo['player2']['name'], pygame.math.Vector2(obj.x, obj.y), fullInfo['player2']['status'], fullInfo['player2']['item_inventory'], fullInfo['player2']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
+                self.player2 = Player(fullInfo['player2']['name'], fullInfo['player1']['pos'], fullInfo['player2']['status'], fullInfo['player2']['item_inventory'], fullInfo['player2']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         
-        
-        # self.player1 = Player(fullInfo['player1']['name'], fullInfo['player1']
-        #                       ['pos'], fullInfo['player1']['status'], fullInfo['player1']['item_inventory'], fullInfo['player1']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
-        # self.player2 = Player(fullInfo['player2']['name'], fullInfo['player2']
-        #                       ['pos'], fullInfo['player2']['status'], fullInfo['player2']['item_inventory'], fullInfo['player2']['seed_inventory'], self.all_sprites, self.collision_sprites, self.tree_sprites, self.interaction_sprites, self.soil_layer, self.toggle_shop, self.toggle_chat)
         self.sky.start_color = fullInfo['start_color']
         self.raining = fullInfo['rain']
         
@@ -258,10 +250,10 @@ class Level:
 
     def update(self, dt):
         for sprite in self.all_sprites.sprites():
-            if sprite is self.player2 or (sprite is self.player1 and self.shop_active) or (sprite is self.player1 and self.chat_active):
+            if sprite is self.player2:
                 sprite.update(dt, canMove=False)
-            # elif sprite is self.player1 and not self.shop_active:
-            #     sprite.update(dt)
+            elif (sprite is self.player1 and self.shop_active) or (sprite is self.player1 and self.chat_active):
+                sprite.update(dt, canMove=False)
             else:
                 sprite.update(dt)
         self.plant_collision()        
@@ -315,14 +307,14 @@ class CameraGroup(pygame.sprite.Group):
                         offset_rect = sprite.rect.copy()
                         offset_rect.center -= self.offset
                         self.display_surface.blit(sprite.image, offset_rect)
-                        if isinstance(sprite, Player) or isinstance(sprite, Tree):
-                            pygame.draw.rect(self.display_surface, (0,255,0), offset_rect, 5)
-                            hitbox_rect = sprite.hitbox.copy()
-                            hitbox_rect.center = offset_rect.center
-                            pygame.draw.rect(self.display_surface, 'gray', hitbox_rect, 5)
-                        if isinstance(sprite, Player):  
-                            target_pos = offset_rect.center + PLAYER_TOOL_OFFSET[sprite.status.split('_')[0]]
-                            pygame.draw.circle(self.display_surface, (0,0,200), target_pos, 5)
+                        # if isinstance(sprite, Player) or isinstance(sprite, Tree):
+                        #     pygame.draw.rect(self.display_surface, (0,255,0), offset_rect, 5)
+                        #     hitbox_rect = sprite.hitbox.copy()
+                        #     hitbox_rect.center = offset_rect.center
+                        #     pygame.draw.rect(self.display_surface, 'gray', hitbox_rect, 5)
+                        # if isinstance(sprite, Player):  
+                        #     target_pos = offset_rect.center + PLAYER_TOOL_OFFSET[sprite.status.split('_')[0]]
+                        #     pygame.draw.circle(self.display_surface, (0,0,200), target_pos, 5)
 
         debug(self.display_surface, player1.name, (player1.rect.centerx -
               self.offset.x, player1.rect.centery - self.offset.y - 40), (255, 255, 0))
