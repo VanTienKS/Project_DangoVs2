@@ -84,10 +84,10 @@ When an item is marked, it means that the basic foundation is in place but not n
     - [ ] Fishing 
 
 ## Notice
-Project Dango Version 2 is inspired by Sprout Valley with author Ze Frost and guided by YouTube channel Code Clean
+Project Dango Version 2 is inspired by Sprout Valley with author Ze Frost and guided by YouTube channel Clear Code
 
 Tileset, monsters, items, players by Ze Frost. · CC license
-Main screen music by Code Clean. · CC license
+Main screen music by Clear Code. · CC license
 River Land Fram map by VanTienKS    
 
 ## About Us 

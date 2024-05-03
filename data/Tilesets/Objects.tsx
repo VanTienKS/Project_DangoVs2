@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="Objects" tilewidth="448" tileheight="448" tilecount="22" columns="0">
+<tileset version="1.10" tiledversion="1.10.2" name="Objects" tilewidth="821" tileheight="719" tilecount="26" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image width="64" height="60" source="../../graphics/objects/bush.png"/>
@@ -66,5 +66,11 @@
  </tile>
  <tile id="21">
   <image width="64" height="128" source="../../graphics/objects/ruin_pillar_broke_alt.png"/>
+ </tile>
+ <tile id="22">
+  <image width="821" height="719" source="../../graphics/objects/boath.png"/>
+ </tile>
+ <tile id="23">
+  <image width="265" height="93" source="../../graphics/objects/car.png"/>
  </tile>
 </tileset>
