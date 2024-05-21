@@ -36,7 +36,6 @@ class Plant(pygame.sprite.Sprite):
             self.image = self.frames[int(self.age)]
             self.rect = self.image.get_rect(center = self.soil.rect.center)
             
-
 class WaterTile(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups):
         super().__init__(groups)
